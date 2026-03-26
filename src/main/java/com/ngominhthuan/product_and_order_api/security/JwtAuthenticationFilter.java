@@ -29,38 +29,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        
-        // Get token from Header
-        String authHeader = request.getHeader("Authorization");
-        String token = null;
-        String username = null;
-
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            token = authHeader.substring(7); 
-            try {
-                username = jwtUtils.extractUsername(token);
-            } catch (Exception e) {
-                logger.error("Error extracting token: " + e.getMessage());
-            }
-        }
-
-        // If there is a username and not yet authenticated
+                String authHeader = request.getHeader("Authorization");
+                String token = null;
+                String username = null;
+                if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                    token = authHeader.substring(7); 
+                    try {
+                        username = jwtUtils.extractUsername(token);
+                    } catch (Exception e) {
+                        logger.error("Error extracting token: " + e.getMessage());
+                    }
+                }
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             if (jwtUtils.validateToken(token)) {
                 User user = userRepository.findByUsername(username).orElse(null);
                 if (user != null) {
-                    // Create authorities from user role
                     List<SimpleGrantedAuthority> authorities = new ArrayList<>();
                     authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRole()));
-
-                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                            user, null, authorities
-                    );
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(user, null, authorities);
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
             }
         }
-
         filterChain.doFilter(request, response);
     }
 }

@@ -6,7 +6,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class ProductAndOrderApiApplication {
-
     public static void main(String[] args) {
         try {
             Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
@@ -16,5 +15,4 @@ public class ProductAndOrderApiApplication {
         }
         SpringApplication.run(ProductAndOrderApiApplication.class, args);
     }
-
 }
